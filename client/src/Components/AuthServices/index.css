@@ -1,0 +1,28 @@
+.AuthServices,
+.AuthText,
+.AuthIcons,
+.AuthIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.AuthServices {
+    flex-direction: column;
+}
+.AuthText {
+    font-size: 25px;
+    font-family: 'Patrick Hand', cursive;
+}
+.AuthIcons {
+    justify-content: space-evenly;
+    margin: 15px 0 0 0;
+    width: 100%;
+}
+.AuthIcon {
+    cursor: pointer;
+}
+.AuthIcon svg {
+    width: 25px;
+    height: 25px;
+}
