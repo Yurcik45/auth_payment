@@ -1,5 +1,6 @@
 .Auth,
-.AuthContainer {
+.AuthContainer,
+.AuthRedirect {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -9,8 +10,16 @@
     width: 100vw;
 }
 .AuthContainer {
+    flex-direction: column;
     padding: 50px 30px;
     border: 2px solid #9d9d9d;
     border-radius: 15px;
     flex-direction: column;
+}
+.AuthRedirect {
+    color: black;
+    font-size: 30px;
+    margin: 15px 0 5px 0;
+    cursor: pointer;
+    font-family: 'Patrick Hand', cursive;
 }

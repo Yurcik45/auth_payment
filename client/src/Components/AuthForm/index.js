@@ -1,26 +1,30 @@
-import { Form, Input, Button, Checkbox, notification } from "antd";
+import { Form, Input, Button, Checkbox } from "antd";
 import "antd/dist/antd.css";
+import { antdNotif } from "../../antdNotif";
+import { useDispatch } from "react-redux";
+import { authUser, registerUser } from "../../redux/actions/auth";
 import "./index.css";
 
 const AuthForm = ({ type }) => {
-    const antdNotif = (type, message, description) => {
-        notification[type]({
-            message,
-            description,
-        });
-    };
+    const dispatch = useDispatch();
     const onFinish = (values) => {
         console.log("Success:", values);
-        if (type !== "register")
-            return antdNotif("success", "requested to auth");
-        if (values.password !== values.password_confirm) {
-            return antdNotif("warning", "passwords not the same");
+        if (type === "auth") {
+            console.log('auth type')
+            dispatch(authUser(values.username, values.password, values.remember));
         }
-        if (values.username.length < 5)
-            return antdNotif("warning", "too short name");
-        if (values.password.lenght < 5)
-            return antdNotif("warning", "too short password");
-        return antdNotif("success", "requested to register");
+        if (type === "register") {
+            console.log('register type')
+            if (values.password !== values.password_confirm) {
+                return antdNotif("warning", "passwords not the same");
+            }
+            if (values.username.length < 5)
+                return antdNotif("warning", "too short name");
+            if (values.password.lenght < 5)
+                return antdNotif("warning", "too short password");
+
+            dispatch(registerUser(values.username, values.password, values.remember));
+        }
     };
 
     const onFinishFailed = (errorInfo) => {

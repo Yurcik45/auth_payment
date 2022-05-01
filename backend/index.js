@@ -8,7 +8,7 @@ const app = express();
 
 app.use(express.json({ extended: true }));
 app.use(cors());
-//app.use('/api', require('./routes/index'));
+app.use('/api/v0', require('./routes/index'));
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => res.send("it is auth_payment backend"));
