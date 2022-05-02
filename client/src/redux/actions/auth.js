@@ -1,4 +1,11 @@
-import { AUTH_USER_SUCCESS, AUTH_USER_PENDING, AUTH_USER_FAIL, REGISTER_USER_SUCCESS, REGISTER_USER_PENDING, REGISTER_USER_FAIL } from "../types";
+import {
+    AUTH_USER_SUCCESS,
+    AUTH_USER_PENDING,
+    AUTH_USER_FAIL,
+    REGISTER_USER_SUCCESS,
+    REGISTER_USER_PENDING,
+    REGISTER_USER_FAIL,
+} from "../types";
 import axios from "axios";
 import { antdNotif } from "../../antdNotif";
 const serv = "http://localhost:4000/api/v0";
@@ -6,6 +13,7 @@ const serv = "http://localhost:4000/api/v0";
 const requestConfig = {
     headers: { "Content-Type": "application/json" },
 };
+const JWT_LIFETIME_SECONDS = 20;
 
 export const registerUser =
     (login, password, remember, role = "user") =>
@@ -22,25 +30,37 @@ export const registerUser =
             .post(url, body, requestConfig)
             .then((res) => {
                 if (res.data.msg) {
-                    dispatch({type: REGISTER_USER_FAIL})
+                    dispatch({ type: REGISTER_USER_FAIL });
                     return antdNotif("error", res.data.msg);
                 }
-                dispatch({type: REGISTER_USER_SUCCESS})
+                dispatch({ type: REGISTER_USER_SUCCESS });
                 console.log(REGISTER_USER_SUCCESS, res);
                 antdNotif(
                     "success",
                     `user ${res.data.login} register succesfully`
                 );
                 setTimeout(() => {
-                    window.location.replace("/auth");
+                    //window.location.replace("/auth");
                 }, 1000);
             })
             .catch((err) => {
-                dispatch({type: REGISTER_USER_FAIL})
+                dispatch({ type: REGISTER_USER_FAIL });
                 console.error(REGISTER_USER_FAIL, err);
-                antdNotif("warning", err.message)
+                antdNotif("warning", err.message);
             });
     };
+export const getDashboardData = (callback) => {
+    requestConfig.headers["Auhorization"] = localStorage.getItem("token");
+    const url = `${serv}/dashboard`;
+    axios
+        .get(url, requestConfig)
+        .then((res) => {
+            console.log("GET DASHBOARD DATA SUCCESS", res);
+        })
+        .catch((err) => {
+            callback(err);
+        });
+};
 export const authUser =
     (login, password, remember, role = "user") =>
     (dispatch) => {
@@ -51,23 +71,30 @@ export const authUser =
             password,
             remember,
             role,
+            JWT_LIFETIME_SECONDS,
         };
         axios
             .post(url, body, requestConfig)
             .then((res) => {
                 if (res.data.msg) {
-                    dispatch({type: AUTH_USER_FAIL})
+                    dispatch({ type: AUTH_USER_FAIL });
                     return antdNotif("error", res.data.msg);
                 }
-                console.log(AUTH_USER_SUCCESS, res);
+                const currentTimeSeconds = Date.now() / 1000;
+                localStorage.setItem(
+                    "tokenExpiresAt",
+                    currentTimeSeconds + JWT_LIFETIME_SECONDS
+                );
+                console.log(AUTH_USER_SUCCESS, res.data.db.login);
                 dispatch({ type: AUTH_USER_SUCCESS, payload: res.data });
-                localStorage.setItem("user_name", res.data.login);
+                localStorage.setItem("user_name", res.data.db.login);
+                localStorage.setItem("token", res.data.token);
                 antdNotif(
                     "success",
-                    `user ${res.data.login} loggined succesfully`
+                    `user ${res.data.db.login} loggined succesfully`
                 );
                 setTimeout(() => {
-                    window.location.replace("/");
+                    //window.location.replace("/");
                 }, 1000);
             })
             .catch((err) => {
@@ -75,25 +102,3 @@ export const authUser =
                 dispatch({ type: AUTH_USER_FAIL, payload: err });
             });
     };
-export const checkAuth = (login) => (dispatch) => {
-    dispatch({ type: AUTH_USER_PENDING });
-    const url = `${serv}/check_login`;
-    const body = {
-        login,
-    };
-    axios
-        .post(url, body, requestConfig)
-        .then((res) => {
-            if (res.data.msg) {
-                window.location.replace("/auth");
-                dispatch({ type: AUTH_USER_FAIL });
-                localStorage.removeItem("user_name");
-                return antdNotif("warning", res.data.msg);
-            }
-            dispatch({ type: AUTH_USER_SUCCESS, payload: res.data });
-        })
-        .catch((err) => {
-            console.error(AUTH_USER_FAIL, err);
-            dispatch({ type: AUTH_USER_FAIL, payload: err });
-        });
-};

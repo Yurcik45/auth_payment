@@ -1,4 +1,11 @@
-import { AUTH_USER_SUCCESS, AUTH_USER_PENDING, AUTH_USER_FAIL, REGISTER_USER_SUCCESS, REGISTER_USER_PENDING, REGISTER_USER_FAIL } from "../types";
+import {
+    AUTH_USER_SUCCESS,
+    AUTH_USER_PENDING,
+    AUTH_USER_FAIL,
+    REGISTER_USER_SUCCESS,
+    REGISTER_USER_PENDING,
+    REGISTER_USER_FAIL,
+} from "../types";
 
 const initialState = {
     name: "",
@@ -8,43 +15,50 @@ const initialState = {
 };
 
 export default (state = initialState, action = {}) => {
+    console.log('auth action', action)
     switch (action.type) {
         case AUTH_USER_SUCCESS:
             return {
-                name: action.login,
-                role: action.role,
+                name: action.payload.db.login,
+                role: action.payload.db.role,
+                token: action.payload.token,
                 loginned: true,
-                pending: false
-            }
+                pending: false,
+            };
         case AUTH_USER_PENDING:
             return {
                 ...state,
-                pending: true
-            }
+                pending: true,
+            };
         case AUTH_USER_FAIL:
             return {
                 name: "",
-                role: '',
+                role: "",
+                token: "",
                 loginned: false,
-                pending: false
-            }
+                pending: false,
+            };
         case REGISTER_USER_SUCCESS:
             return {
                 name: "",
-                role: '',
+                role: "",
+                token: "",
                 loginned: false,
-                pending: false
-            }
+                pending: false,
+            };
         case REGISTER_USER_PENDING:
             return {
                 ...state,
-                pending: true
-            }
+                pending: true,
+            };
         case REGISTER_USER_FAIL:
             return {
-                ...state,
-                pending: false
-            }
+                name: "",
+                role: "",
+                token: "",
+                loginned: false,
+                pending: false,
+            };
         default:
             return state;
     }

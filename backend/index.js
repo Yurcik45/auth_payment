@@ -14,3 +14,5 @@ app.use(bodyParser.json());
 app.get("/", (req, res) => res.send("it is auth_payment backend"));
 
 app.listen(PORT, () => console.log(`-- server started on port ${PORT} --`));
+
+console.log(process.env)
