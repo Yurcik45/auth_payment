@@ -8,8 +8,8 @@ import { applyMiddleware, combineReducers, createStore } from "redux";
 import auth from "./redux/reducers/auth";
 import thunk from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
-import {loggingMiddleware, refreshToken} from "./redux/refreshToken";
-const rootReducer = combineReducers({auth})
+import { loggingMiddleware } from "./redux/refreshToken";
+const rootReducer = combineReducers({ auth });
 const middleware = [thunk, loggingMiddleware];
 const initialState = {};
 const store = createStore(
@@ -20,11 +20,9 @@ const store = createStore(
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-    <React.StrictMode>
-        <BrowserRouter>
-            <Provider store={store}>
-                <App />
-            </Provider>
-        </BrowserRouter>
-    </React.StrictMode>
+    <BrowserRouter>
+        <Provider store={store}>
+            <App />
+        </Provider>
+    </BrowserRouter>
 );

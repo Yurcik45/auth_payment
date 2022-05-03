@@ -8,6 +8,8 @@ import {
     ACCOUNT_STATUS_ACTIVE,
     ACCOUNT_STATUS_PENDING,
     ACCOUNT_STATUS_BLOCKED,
+    INITIAL_AUTH_SUCCESS,
+    INITIAL_AUTH_FAIL,
 } from "../types";
 import axios from "axios";
 import { antdNotif } from "../../antdNotif";
@@ -52,6 +54,20 @@ export const registerUser =
                 antdNotif("warning", err.message);
             });
     };
+export const initialAuth = (token, login) => dispatch => {
+    requestConfig.headers["Authorization"] = token;
+    const url = `${serv}/initialAuth`;
+    const body = {login};
+    axios.post(url, body, requestConfig)
+        .then(res => {
+            console.log(INITIAL_AUTH_SUCCESS, res)
+            dispatch({type: INITIAL_AUTH_SUCCESS, payload: res.data})
+        })
+        .catch(err => {
+            console.log(INITIAL_AUTH_FAIL, err)
+            dispatch({type: INITIAL_AUTH_FAIL})
+        })
+}
 export const getDashboardData = (callback) => (dispatch) => {
     requestConfig.headers["Authorization"] = localStorage.getItem("token");
     const timeToEnd =

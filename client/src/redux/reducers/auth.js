@@ -8,6 +8,8 @@ import {
     ACCOUNT_STATUS_ACTIVE,
     ACCOUNT_STATUS_PENDING,
     ACCOUNT_STATUS_BLOCKED,
+    INITIAL_AUTH_SUCCESS,
+    INITIAL_AUTH_FAIL,
 } from "../types";
 
 const initialState = {
@@ -20,6 +22,24 @@ const initialState = {
 
 export default (state = initialState, action = {}) => {
     switch (action.type) {
+        case INITIAL_AUTH_SUCCESS:
+            return {
+                ...state,
+                name: action.payload.login,
+                role: action.payload.role,
+                token: action.payload.token,
+                loginned: true,
+                pending: false,
+            };
+        case INITIAL_AUTH_FAIL:
+            return {
+                name: "",
+                role: "",
+                status: "",
+                token: "",
+                loginned: false,
+                pending: false,
+            };
         case AUTH_USER_SUCCESS:
             return {
                 ...state,

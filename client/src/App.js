@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { antdNotif } from "./antdNotif";
@@ -6,7 +6,7 @@ import Auth from "./Pages/Auth";
 import Dashboard from "./Pages/Dashboard";
 import Home from "./Pages/Home";
 import Page404 from "./Pages/Page404";
-import { checkAuth, getDashboardData } from "./redux/actions/auth";
+import { checkAuth, getDashboardData, initialAuth } from "./redux/actions/auth";
 import axios from "axios";
 import { notification } from "antd";
 
@@ -25,7 +25,16 @@ const App = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const loginned = useSelector((state) => state.auth.loginned);
+    useCallback(() => {
+        console.log('use memo')
+    }, [])
     useEffect(() => {
+        dispatch(
+            initialAuth(
+                localStorage.getItem("token"),
+                localStorage.getItem("user_name")
+            )
+        );
         if (
             !localStorage.getItem("token") ||
             !localStorage.getItem("user_name")

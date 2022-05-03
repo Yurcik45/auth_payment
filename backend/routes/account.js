@@ -9,7 +9,6 @@ const generateAccessToken = (login, lifetime) => {
     });
 };
 const tokenRefresh = async (req, res) => {
-
     const {login, JWT_LIFETIME_SECONDS} = req.body;
     console.log({login, JWT_LIFETIME_SECONDS})
     const token = generateAccessToken(login, JWT_LIFETIME_SECONDS)
@@ -17,6 +16,17 @@ const tokenRefresh = async (req, res) => {
         msg: "Token refreshed succesful",
         token
     })
+}
+const initialAuth = async (req, res) => {
+    const { login } = req.body;
+    const user = await pg_pool.query(`SELECT login, status, role FROM users WHERE login='${login}'`)
+    console.log('GET INITIAL DATA PG', user.rows[0])
+    res.status(200).json({
+        login: user.rows[0].login,
+        status: user.rows[0].status,
+        role: user.rows[0].role,
+    })
+
 }
 const userLogin = async (req, res) => {
     const { login, password, remember, JWT_LIFETIME_SECONDS } = req.body;
@@ -85,6 +95,7 @@ const userRegister = async (req, res) => {
 
 module.exports = {
     userLogin,
+    initialAuth,
     userRegister,
     tokenRefresh,
 };
