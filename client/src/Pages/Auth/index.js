@@ -1,3 +1,4 @@
+import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import AuthForm from "../../Components/AuthForm/index";
 import AuthServices from "../../Components/AuthServices/index";
@@ -14,10 +15,13 @@ const Auth = ({ type }) => {
             navigation("/auth");
         }
     };
+    const status = useSelector((state) => state.auth.status);
     return (
         <div className="Auth">
             <div className="AuthContainer">
-                <AuthForm type={type} />
+                {(status === "PENDING" && "check your email") ||
+                    (status === "BLOCKED" && "your accaunt is blocked") ||
+                    (status === "" && <AuthForm type={type} />)}
                 <div onClick={authRedirect} className="AuthRedirect">
                     {(location === "/auth" &&
                         "If you doesn't have account, click here") ||

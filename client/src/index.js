@@ -8,10 +8,14 @@ import { applyMiddleware, combineReducers, createStore } from "redux";
 import auth from "./redux/reducers/auth";
 import thunk from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
+import {loggingMiddleware, refreshToken} from "./redux/refreshToken";
 const rootReducer = combineReducers({auth})
+const middleware = [thunk, loggingMiddleware];
+const initialState = {};
 const store = createStore(
     rootReducer,
-    composeWithDevTools(applyMiddleware(thunk))
+    initialState,
+    composeWithDevTools(applyMiddleware(...middleware))
 );
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

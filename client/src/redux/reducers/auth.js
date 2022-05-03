@@ -5,20 +5,24 @@ import {
     REGISTER_USER_SUCCESS,
     REGISTER_USER_PENDING,
     REGISTER_USER_FAIL,
+    ACCOUNT_STATUS_ACTIVE,
+    ACCOUNT_STATUS_PENDING,
+    ACCOUNT_STATUS_BLOCKED,
 } from "../types";
 
 const initialState = {
     name: "",
     role: "",
+    status: "", //ACTIVE | PENDING | BLOCKED
     loginned: false,
     pending: false,
 };
 
 export default (state = initialState, action = {}) => {
-    console.log('auth action', action)
     switch (action.type) {
         case AUTH_USER_SUCCESS:
             return {
+                ...state,
                 name: action.payload.db.login,
                 role: action.payload.db.role,
                 token: action.payload.token,
@@ -34,6 +38,7 @@ export default (state = initialState, action = {}) => {
             return {
                 name: "",
                 role: "",
+                status: "",
                 token: "",
                 loginned: false,
                 pending: false,
@@ -42,6 +47,7 @@ export default (state = initialState, action = {}) => {
             return {
                 name: "",
                 role: "",
+                status: "",
                 token: "",
                 loginned: false,
                 pending: false,
@@ -55,9 +61,25 @@ export default (state = initialState, action = {}) => {
             return {
                 name: "",
                 role: "",
+                status: "",
                 token: "",
                 loginned: false,
                 pending: false,
+            };
+        case ACCOUNT_STATUS_ACTIVE:
+            return {
+                ...state,
+                status: action.payload,
+            };
+        case ACCOUNT_STATUS_PENDING:
+            return {
+                ...state,
+                status: action.payload,
+            };
+        case ACCOUNT_STATUS_BLOCKED:
+            return {
+                ...state,
+                status: action.payload,
             };
         default:
             return state;

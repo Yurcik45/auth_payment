@@ -4,17 +4,29 @@ import { antdNotif } from "../../antdNotif";
 import { useDispatch } from "react-redux";
 import { authUser, registerUser } from "../../redux/actions/auth";
 import "./index.css";
+import { useNavigate } from "react-router-dom";
 
 const AuthForm = ({ type }) => {
     const dispatch = useDispatch();
+    const navigator = useNavigate();
     const onFinish = (values) => {
         console.log("Success:", values);
         if (type === "auth") {
-            console.log('auth type')
-            dispatch(authUser(values.username, values.password, values.remember));
+            console.log("auth type");
+            dispatch(
+                authUser(
+                    values.username,
+                    values.password,
+                    values.remember,
+                    "user",
+                    () => {
+                        navigator("/");
+                    }
+                )
+            );
         }
         if (type === "register") {
-            console.log('register type')
+            console.log("register type");
             if (values.password !== values.password_confirm) {
                 return antdNotif("warning", "passwords not the same");
             }
@@ -23,7 +35,17 @@ const AuthForm = ({ type }) => {
             if (values.password.lenght < 5)
                 return antdNotif("warning", "too short password");
 
-            dispatch(registerUser(values.username, values.password, values.remember));
+            dispatch(
+                registerUser(
+                    values.username,
+                    values.password,
+                    values.remember,
+                    "user",
+                    () => {
+                        navigator("/auth");
+                    }
+                )
+            );
         }
     };
 
@@ -58,7 +80,7 @@ const AuthForm = ({ type }) => {
                         },
                     ]}
                 >
-                    <Input />
+                    <Input value="yurcik45"/>
                 </Form.Item>
                 <Form.Item
                     label="Password"

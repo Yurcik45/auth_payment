@@ -7,6 +7,8 @@ import Dashboard from "./Pages/Dashboard";
 import Home from "./Pages/Home";
 import Page404 from "./Pages/Page404";
 import { checkAuth, getDashboardData } from "./redux/actions/auth";
+import axios from "axios";
+import { notification } from "antd";
 
 const App = () => {
     const location = useLocation();
@@ -14,21 +16,19 @@ const App = () => {
     const navigate = useNavigate();
     const loginned = useSelector((state) => state.auth.loginned);
     useEffect(() => {
-        //if (!localStorage.getItem("token")) {
-        //    navigate("/auth");
-        //    antdNotif("error", "unauthorized");
-        //}
-        getDashboardData((err) => {
-            console.log("GET DASHBOARD DATA ERROR", err);
+        if (
+            !localStorage.getItem("token") ||
+            !localStorage.getItem("user_name")
+        ) {
             if (
-                err.response.status == 401 &&
-                location.pathname !== "/auth" &&
-                location.pathname !== "/register"
+                location.pathname !== "/register" &&
+                location.pathname !== "/auth"
             ) {
                 navigate("/auth");
-                antdNotif("error", err.response.data);
+                antdNotif("error", "unauthorized");
             }
-        });
+        }
+        //dispatch(getDashboardData(() => navigate("/auth")));
     }, []);
     return (
         <div className="App">
