@@ -89,7 +89,7 @@ export default (state = initialState, action = {}) => {
         case ACCOUNT_STATUS_ACTIVE:
             return {
                 ...state,
-                status: action.payload,
+                status: "ACTIVE",
             };
         case ACCOUNT_STATUS_PENDING:
             return {

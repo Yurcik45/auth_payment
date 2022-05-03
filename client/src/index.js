@@ -10,7 +10,7 @@ import thunk from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { loggingMiddleware } from "./redux/refreshToken";
 const rootReducer = combineReducers({ auth });
-const middleware = [thunk, loggingMiddleware];
+const middleware = [thunk ];
 const initialState = {};
 const store = createStore(
     rootReducer,

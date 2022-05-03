@@ -54,20 +54,21 @@ export const registerUser =
                 antdNotif("warning", err.message);
             });
     };
-export const initialAuth = (token, login) => dispatch => {
+export const initialAuth = (token, login) => (dispatch) => {
     requestConfig.headers["Authorization"] = token;
     const url = `${serv}/initialAuth`;
-    const body = {login};
-    axios.post(url, body, requestConfig)
-        .then(res => {
-            console.log(INITIAL_AUTH_SUCCESS, res)
-            dispatch({type: INITIAL_AUTH_SUCCESS, payload: res.data})
+    const body = { login };
+    axios
+        .post(url, body, requestConfig)
+        .then((res) => {
+            console.log(INITIAL_AUTH_SUCCESS, res);
+            dispatch({ type: INITIAL_AUTH_SUCCESS, payload: res.data });
         })
-        .catch(err => {
-            console.log(INITIAL_AUTH_FAIL, err)
-            dispatch({type: INITIAL_AUTH_FAIL})
-        })
-}
+        .catch((err) => {
+            console.log(INITIAL_AUTH_FAIL, err);
+            dispatch({ type: INITIAL_AUTH_FAIL });
+        });
+};
 export const getDashboardData = (callback) => (dispatch) => {
     requestConfig.headers["Authorization"] = localStorage.getItem("token");
     const timeToEnd =
@@ -92,6 +93,21 @@ export const getDashboardData = (callback) => (dispatch) => {
                 }, 1000);
             }
             callback(err);
+        });
+};
+export const confirmEmail = (login, code, callback) => (dispatch) => {
+    const body = { login, code };
+    const url = `${serv}/auth/confirm`;
+    axios
+        .post(url, body, requestConfig)
+        .then((res) => {
+            console.log(ACCOUNT_STATUS_ACTIVE, res);
+            dispatch({ type: ACCOUNT_STATUS_ACTIVE });
+            antdNotif("success", res.data.msg);
+            callback();
+        })
+        .catch((err) => {
+            console.log(ACCOUNT_STATUS_PENDING, err);
         });
 };
 export const authUser =
@@ -145,6 +161,10 @@ export const authUser =
                         type: ACCOUNT_STATUS_PENDING,
                         payload: err.response.data.status,
                     });
+                    localStorage.setItem(
+                        "user_name",
+                        err.response.data.db.login
+                    );
                     antdNotif("warning", err.response.data.msg);
                 }
                 if (status == 405) {

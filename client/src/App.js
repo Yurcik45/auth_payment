@@ -9,6 +9,7 @@ import Page404 from "./Pages/Page404";
 import { checkAuth, getDashboardData, initialAuth } from "./redux/actions/auth";
 import axios from "axios";
 import { notification } from "antd";
+import Confirm from "./Pages/Confirm";
 
 const style = {
     display: "flex",
@@ -26,26 +27,28 @@ const App = () => {
     const navigate = useNavigate();
     const loginned = useSelector((state) => state.auth.loginned);
     useCallback(() => {
-        console.log('use memo')
-    }, [])
+        console.log("use memo");
+    }, []);
     useEffect(() => {
-        dispatch(
-            initialAuth(
-                localStorage.getItem("token"),
-                localStorage.getItem("user_name")
-            )
-        );
         if (
             !localStorage.getItem("token") ||
             !localStorage.getItem("user_name")
         ) {
             if (
                 location.pathname !== "/register" &&
-                location.pathname !== "/auth"
+                location.pathname !== "/auth" &&
+                location.pathname.split("/")[2] !== "confirm"
             ) {
-                navigate("/auth");
+                //navigate("/auth");
                 antdNotif("error", "unauthorized");
             }
+        } else {
+            dispatch(
+                initialAuth(
+                    localStorage.getItem("token"),
+                    localStorage.getItem("user_name")
+                )
+            );
         }
         //dispatch(getDashboardData(() => navigate("/auth")));
     }, []);
@@ -65,6 +68,12 @@ const App = () => {
                 {loginned && (
                     <Route exect path="/dashboard" element={<Dashboard />} />
                 )}
+
+                <Route
+                    exect
+                    path="/auth/confirm/:user/:code"
+                    element={<Confirm />}
+                />
                 <Route exect path="/*" element={<Page404 />} />
             </Routes>
         </div>

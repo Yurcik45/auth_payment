@@ -21,7 +21,7 @@ const Auth = ({ type }) => {
             <div className="AuthContainer">
                 {(status === "PENDING" && "check your email") ||
                     (status === "BLOCKED" && "your accaunt is blocked") ||
-                    (status === "" && <AuthForm type={type} />)}
+                    ((status === "" || status === "ACTIVE") && <AuthForm type={type} />)}
                 <div onClick={authRedirect} className="AuthRedirect">
                     {(location === "/auth" &&
                         "If you doesn't have account, click here") ||

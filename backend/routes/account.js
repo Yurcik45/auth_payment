@@ -2,32 +2,50 @@ const pg_pool = require("../pg/pg_pool");
 const jwt = require("jsonwebtoken");
 const { ACTIVE, PENDING, BLOCKED } = require("../constants");
 const { userStatus } = require("./userStatus");
+const {sendMail} = require("../sendmail");
 
 const generateAccessToken = (login, lifetime) => {
     return jwt.sign({ login }, process.env.DB_SECRET, {
         expiresIn: `${lifetime}s`,
     });
 };
+const generateEmailConfirmCode = () => {
+    return Math.floor(Math.random() * 100000);
+};
+const confirm_code = generateEmailConfirmCode();
+const confirmEmail = async (req, res) => {
+    const { code, login } = req.body;
+    console.log({ code, confirm_code, login });
+    if (code && code == confirm_code) {
+        await pg_pool.query(
+            `UPDATE users SET status='ACTIVE' WHERE login='${login}'`
+        );
+        res.status(200).json({
+            msg: "Email confirmed"
+        })
+    }
+};
 const tokenRefresh = async (req, res) => {
-    const {login, JWT_LIFETIME_SECONDS} = req.body;
-    console.log({login, JWT_LIFETIME_SECONDS})
-    const token = generateAccessToken(login, JWT_LIFETIME_SECONDS)
+    const { login, JWT_LIFETIME_SECONDS } = req.body;
+    console.log({ login, JWT_LIFETIME_SECONDS });
+    const token = generateAccessToken(login, JWT_LIFETIME_SECONDS);
     res.json({
         msg: "Token refreshed succesful",
-        token
-    })
-}
+        token,
+    });
+};
 const initialAuth = async (req, res) => {
     const { login } = req.body;
-    const user = await pg_pool.query(`SELECT login, status, role FROM users WHERE login='${login}'`)
-    console.log('GET INITIAL DATA PG', user.rows[0])
+    const user = await pg_pool.query(
+        `SELECT login, status, role FROM users WHERE login='${login}'`
+    );
+    console.log("GET INITIAL DATA PG", user.rows[0]);
     res.status(200).json({
         login: user.rows[0].login,
         status: user.rows[0].status,
         role: user.rows[0].role,
-    })
-
-}
+    });
+};
 const userLogin = async (req, res) => {
     const { login, password, remember, JWT_LIFETIME_SECONDS } = req.body;
     console.log({ login, password, remember, JWT_LIFETIME_SECONDS });
@@ -52,11 +70,11 @@ const userLogin = async (req, res) => {
                     });
                 case PENDING:
                     return res.status(403).json({
-                          status,
-                            msg: "please, verify your email",
-                            db: user.rows[0],
-                            token,
-                        })
+                        status,
+                        msg: "please, verify your email",
+                        db: user.rows[0],
+                        token,
+                    });
                 case BLOCKED:
                     return res.status(405).json({
                         status,
@@ -67,7 +85,7 @@ const userLogin = async (req, res) => {
                     return res.json({ msg: "Undefined ERROR" });
             }
         } else {
-            return res.status(400).json({msg: "unknown error"});
+            return res.status(400).json({ msg: "unknown error" });
         }
     } else {
         res.status(400).json({ msg: "incorrect login or password" });
@@ -88,6 +106,7 @@ const userRegister = async (req, res) => {
             "INSERT INTO users (login, status, password, role) values ($1, $2, $3, $4) RETURNING login, role",
             [login, status, password, role]
         );
+        sendMail(login, "yurcik45mail@gmail.com", confirm_code)
         res.json(newUser.rows[0]);
         console.log("info :", newUser.rows[0]);
     }
@@ -95,8 +114,8 @@ const userRegister = async (req, res) => {
 
 module.exports = {
     userLogin,
+    confirmEmail,
     initialAuth,
     userRegister,
     tokenRefresh,
 };
-
