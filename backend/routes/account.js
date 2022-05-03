@@ -11,7 +11,8 @@ const generateAccessToken = (login, lifetime) => {
 const tokenRefresh = async (req, res) => {
 
     const {login, JWT_LIFETIME_SECONDS} = req.body;
-    const token = jwt.generateAccessToken(login, JWT_LIFETIME_SECONDS)
+    console.log({login, JWT_LIFETIME_SECONDS})
+    const token = generateAccessToken(login, JWT_LIFETIME_SECONDS)
     res.json({
         msg: "Token refreshed succesful",
         token

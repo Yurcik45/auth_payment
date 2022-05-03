@@ -11,12 +11,12 @@ import {
 } from "../types";
 import axios from "axios";
 import { antdNotif } from "../../antdNotif";
-import { serv } from "../serv";
+import { serv } from "../../constants";
+import { JWT_LIFETIME_SECONDS } from "../../constants";
 
 const requestConfig = {
     headers: { "Content-Type": "application/json" },
 };
-const JWT_LIFETIME_SECONDS = 20;
 
 export const registerUser =
     (login, password, remember, role = "user", callback) =>
@@ -54,8 +54,9 @@ export const registerUser =
     };
 export const getDashboardData = (callback) => (dispatch) => {
     requestConfig.headers["Authorization"] = localStorage.getItem("token");
-    const timeToEnd = (Date.now() / 1000) - localStorage.getItem('tokenExpiresAt')
-    console.log('tte', timeToEnd)
+    const timeToEnd =
+        Date.now() / 1000 - localStorage.getItem("tokenExpiresAt");
+    console.log("tte", timeToEnd);
     const url = `${serv}/dashboard`;
     axios
         .get(url, requestConfig)
@@ -64,41 +65,17 @@ export const getDashboardData = (callback) => (dispatch) => {
             antdNotif("success", "token is in actual condition");
         })
         .catch((err) => {
-            const token = localStorage.getItem("token");
-            const login = localStorage.getItem("user_name");
-            getNewToken(login, token, (status, msg) => {
-                console.log("token status", status);
-                console.log("token msg", msg);
-            });
             if (err.response.status == 401 || err.response.status == 403) {
-                //dispatch({ type: AUTH_USER_FAIL });
-                //antdNotif("error", err.response.data.msg);
-                //setTimeout(() => {
-                //    antdNotif("warning", "please, login one more time");
-                //}, 500);
-                //setTimeout(() => {
-                //    callback();
-                //}, 1000);
+                dispatch({ type: AUTH_USER_FAIL });
+                antdNotif("error", err.response.data.msg);
+                setTimeout(() => {
+                    antdNotif("warning", "please, login one more time");
+                }, 500);
+                setTimeout(() => {
+                    callback();
+                }, 1000);
             }
             callback(err);
-        });
-};
-export const getNewToken = (login, old_token, callback) => {
-    requestConfig.headers["Authorization"] = old_token;
-    const url = `${serv}/login/refresh_token`;
-    const body = {
-        login,
-        JWT_LIFETIME_SECONDS,
-    };
-    axios
-        .post(url, body, requestConfig)
-        .then((res) => {
-            console.log("AXIOS token refresh success", res);
-            callback(res.status, res.data.msg);
-        })
-        .catch((err) => {
-            console.log("AXIOS token refresh fail", err);
-            callback(err.response.status, err.response.data.msg);
         });
 };
 export const authUser =

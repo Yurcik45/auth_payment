@@ -10,6 +10,16 @@ import { checkAuth, getDashboardData } from "./redux/actions/auth";
 import axios from "axios";
 import { notification } from "antd";
 
+const style = {
+    display: "flex",
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    width: 100,
+    height: 30,
+    border: "1px solid black",
+    borderRadius: 10,
+};
 const App = () => {
     const location = useLocation();
     const dispatch = useDispatch();
@@ -32,6 +42,9 @@ const App = () => {
     }, []);
     return (
         <div className="App">
+            <div style={style} onClick={() => localStorage.clear()}>
+                clear LS
+            </div>
             <Routes>
                 <Route exect path="/" element={<Home />} />
                 <Route exect path="/auth" element={<Auth type="auth" />} />
